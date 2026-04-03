@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZuopintijiaoDao">
+
+    <resultMap id="BaseResultMap" type="com.entity.ZuopintijiaoEntity">
+        <id column="id" property="id"/>
+        <result column="xuehao" property="xuehao"/>
+        <result column="xueshengxingming" property="xueshengxingming"/>
+        <result column="jingsaimingcheng" property="jingsaimingcheng"/>
+        <result column="jingsaixinxiid" property="jingsaixinxiid"/>
+        <result column="baomingid" property="baomingid"/>
+        <result column="zuopinmingcheng" property="zuopinmingcheng"/>
+        <result column="zuopinmiaoshu" property="zuopinmiaoshu"/>
+        <result column="fujianwenjian" property="fujianwenjian"/>
+        <result column="tijiaoshijian" property="tijiaoshijian"/>
+        <result column="zhuangtai" property="zhuangtai"/>
+        <result column="banben" property="banben"/>
+        <result column="addtime" property="addtime"/>
+    </resultMap>
+
+    <select id="selectListView" resultMap="BaseResultMap">
+        SELECT * FROM zuopintijiao
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+
+    <select id="selectView" resultMap="BaseResultMap">
+        SELECT * FROM zuopintijiao
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        LIMIT 1
+    </select>
+
+</mapper>

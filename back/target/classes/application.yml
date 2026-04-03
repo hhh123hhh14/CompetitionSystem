@@ -1,0 +1,39 @@
+# 服务器配置
+server:
+  tomcat:
+    uri-encoding: UTF-8  # 解决URL中文乱码
+  port: 8080  # 端口，被占用可改8081
+  servlet:
+    context-path: /springbootrd362  # 匹配SQL脚本中的图片/接口路径
+
+# 数据库配置
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/t101?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&zeroDateTimeBehavior=convertToNull
+    username: root  # 你的MySQL用户名（默认root）
+    password: 1234  # 【重点】替换为你的MySQL root密码，不是1234则改这里
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 单文件最大10MB
+      max-request-size: 10MB  # 单次请求最大10MB
+  resources:
+    static-locations: classpath:static/,file:static/
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml  # Mapper.xml文件路径
+  typeAliasesPackage: com.entity  # 实体类包路径
+  global-config:
+    id-type: 1  # 主键类型：1=用户输入ID，匹配SQL里的自增主键
+    field-strategy: 2  # 字段策略：非空判断
+    db-column-underline: true  # 下划线转驼峰
+    refresh-mapper: true  # 调试时刷新mapper
+    logic-delete-value: -1  # 逻辑删除值
+    logic-not-delete-value: 0  # 逻辑未删除值
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+  configuration:
+    map-underscore-to-camel-case: true  # 下划线转驼峰
+    cache-enabled: false  # 关闭缓存
+    call-setters-on-nulls: true  # 空值也返回
+    jdbc-type-for-null: 'null'  # 处理null值（适配MySQL）

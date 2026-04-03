@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.HuojiangDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.entity.HuojiangEntity">
+        <id column="id" property="id"/>
+        <result column="jingsaixinxiid" property="jingsaixinxiid"/>
+        <result column="jingsaimingcheng" property="jingsaimingcheng"/>
+        <result column="jingsaileixing" property="jingsaileixing"/>
+        <result column="jingsaijib" property="jingsaijib"/>
+        <result column="xuehao" property="xuehao"/>
+        <result column="xueshengxingming" property="xueshengxingming"/>
+        <result column="xueyuanmingcheng" property="xueyuanmingcheng"/>
+        <result column="tuanduimingcheng" property="tuanduimingcheng"/>
+        <result column="tuanduichengyuan" property="tuanduichengyuan"/>
+        <result column="jiangxiangmingcheng" property="jiangxiangmingcheng"/>
+        <result column="jiangxiangdengji" property="jiangxiangdengji"/>
+        <result column="gonghao" property="gonghao"/>
+        <result column="jiaoshixingming" property="jiaoshixingming"/>
+        <result column="huojiangriqi" property="huojiangriqi"/>
+        <result column="zhengshu" property="zhengshu"/>
+        <result column="beizhu" property="beizhu"/>
+        <result column="sfgs" property="sfgs"/>
+        <result column="addtime" property="addtime"/>
+    </resultMap>
+
+    <select id="selectListView" resultMap="BaseResultMap">
+        SELECT * FROM huojiang
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+
+    <select id="selectView" resultMap="BaseResultMap">
+        SELECT * FROM huojiang
+        <where>
+            ${ew.sqlSegment}
+        </where>
+        LIMIT 1
+    </select>
+
+    <!-- 按学院统计获奖数量 -->
+    <select id="countByXueyuan" resultType="java.util.Map">
+        SELECT xueyuanmingcheng AS name, COUNT(*) AS value
+        FROM huojiang
+        GROUP BY xueyuanmingcheng
+        ORDER BY value DESC
+    </select>
+
+    <!-- 按竞赛级别统计 -->
+    <select id="countByJib" resultType="java.util.Map">
+        SELECT jingsaijib AS name, COUNT(*) AS value
+        FROM huojiang
+        GROUP BY jingsaijib
+        ORDER BY value DESC
+    </select>
+
+    <!-- 按奖项等级统计 -->
+    <select id="countByDengji" resultType="java.util.Map">
+        SELECT jiangxiangdengji AS name, COUNT(*) AS value
+        FROM huojiang
+        GROUP BY jiangxiangdengji
+        ORDER BY value DESC
+    </select>
+
+</mapper>

@@ -55,6 +55,26 @@
               <el-input v-model="ruleForm.shoufeibiaozhun" placeholder="如：免费 或 100元/队" clearable></el-input>
             </el-form-item>
           </el-col>
+          <el-col :span="12" v-if="ruleForm.moshi === '付费'">
+            <el-form-item label="收款码">
+              <el-upload
+                :action="uploadUrl"
+                :headers="uploadHeaders"
+                list-type="picture-card"
+                :on-success="handleQrcodeUploadSuccess"
+                :on-remove="handleQrcodeRemove"
+                :file-list="qrcodeFileList"
+                :limit="1"
+                :disabled="type === 'info'"
+                accept="image/*">
+                <i class="el-icon-plus"></i>
+                <div slot="tip" class="el-upload__tip">上传微信/支付宝收款码图片</div>
+              </el-upload>
+              <div v-if="ruleForm.shoukuanma && type === 'info'" style="margin-top:8px">
+                <img :src="ruleForm.shoukuanma" style="width:120px;height:120px;object-fit:contain;border-radius:4px;border:1px solid #ebeef5" />
+              </div>
+            </el-form-item>
+          </el-col>
         </el-row>
 
         <el-divider content-position="left">时间设置</el-divider>
@@ -188,7 +208,9 @@ export default {
       },
       moshiOptions: ['付费', '免费'],
       fileList: [],
+      qrcodeFileList: [],
       customFields: [],  // 动态字段列表
+      formDirty: false,  // 表单是否有未保存修改
       typeNameMap: {
         text: '文本', number: '数字', textarea: '多行文本',
         radio: '单选', checkbox: '多选', select: '下拉', date: '日期'
@@ -199,11 +221,24 @@ export default {
     uploadUrl() { return `/springbootrd362/file/upload` },
     uploadHeaders() { return { Token: this.$storage.get('Token') } }
   },
+  watch: {
+    ruleForm: { handler() { if (this.type !== 'info') this.formDirty = true }, deep: true }
+  },
+  mounted() {
+    this._beforeUnload = (e) => {
+      if (this.formDirty) { e.preventDefault(); e.returnValue = '' }
+    }
+    window.addEventListener('beforeunload', this._beforeUnload)
+  },
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this._beforeUnload)
+  },
   methods: {
     init(id, type) {
       this.type = type || 'else'
       this.ruleForm = { zhuangtai: '报名中', moshi: '免费', jingsaijib: '国家级' }
       this.fileList = []
+      this.qrcodeFileList = []
       this.customFields = []
       if (id) {
         this.$http({ url: `jingsaixinxi/info/${id}`, method: 'get' }).then(({ data }) => {
@@ -211,6 +246,9 @@ export default {
             this.ruleForm = data.data
             if (this.ruleForm.fengmiantupian) {
               this.fileList = [{ name: '封面', url: this.ruleForm.fengmiantupian }]
+            }
+            if (this.ruleForm.shoukuanma) {
+              this.qrcodeFileList = [{ name: '收款码', url: this.ruleForm.shoukuanma }]
             }
             // 加载该竞赛的动态字段配置
             this.loadCustomFields(id)
@@ -229,17 +267,33 @@ export default {
       if (res.code === 0) this.ruleForm.fengmiantupian = res.data
     },
     handleRemove() { this.ruleForm.fengmiantupian = '' },
+    handleQrcodeUploadSuccess(res) {
+      if (res.code === 0) this.ruleForm.shoukuanma = res.data
+    },
+    handleQrcodeRemove() { this.ruleForm.shoukuanma = '' },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (!valid) return
-        const url = this.ruleForm.id ? 'jingsaixinxi/update' : 'jingsaixinxi/save'
-        this.$http({ url, method: 'post', data: this.ruleForm }).then(({ data }) => {
-          if (data && data.code === 0) {
-            const savedId = this.ruleForm.id || data.data
-            // 保存动态字段
-            this.saveCustomFields(this.ruleForm.id || savedId, data)
-          } else { this.$message.error(data.msg) }
-        })
+        const isNew = !this.ruleForm.id
+        const actionText = isNew ? '发布' : '更新'
+        this.$confirm(
+          isNew
+            ? '确认发布此竞赛？发布后学生将可以看到并报名。'
+            : '确认更新竞赛信息？已报名的学生将看到更新后的内容。',
+          actionText + '确认',
+          { confirmButtonText: '确认' + actionText, cancelButtonText: '取消', type: 'info',
+            iconClass: isNew ? 'el-icon-s-promotion' : 'el-icon-edit' }
+        ).then(() => {
+          const url = this.ruleForm.id ? 'jingsaixinxi/update' : 'jingsaixinxi/save'
+          this.$http({ url, method: 'post', data: this.ruleForm }).then(({ data }) => {
+            if (data && data.code === 0) {
+              const savedId = this.ruleForm.id || data.data
+              this.formDirty = false
+              // 保存动态字段
+              this.saveCustomFields(this.ruleForm.id || savedId, data)
+            } else { this.$message.error(data.msg) }
+          })
+        }).catch(() => {})
       })
     },
     saveCustomFields(jingsaixinxiid, prevData) {
@@ -268,8 +322,18 @@ export default {
       })
     },
     singleClose() {
-      this.parent.showFlag = true
-      this.parent.addOrUpdateFlag = false
+      if (this.formDirty && this.type !== 'info') {
+        this.$confirm('当前内容尚未保存，确认离开？', '未保存提醒', {
+          confirmButtonText: '确认离开', cancelButtonText: '继续编辑', type: 'warning'
+        }).then(() => {
+          this.formDirty = false
+          this.parent.showFlag = true
+          this.parent.addOrUpdateFlag = false
+        }).catch(() => {})
+      } else {
+        this.parent.showFlag = true
+        this.parent.addOrUpdateFlag = false
+      }
     }
   }
 }

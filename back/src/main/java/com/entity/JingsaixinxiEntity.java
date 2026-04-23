@@ -96,6 +96,9 @@ public class JingsaixinxiEntity<T> implements Serializable {
     /** 竞赛状态（报名中/进行中/已结束） */
     private String zhuangtai;
 
+    /** 收款码图片 */
+    private String shoukuanma;
+
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat
     private Date addtime;
@@ -159,4 +162,7 @@ public class JingsaixinxiEntity<T> implements Serializable {
 
     public String getZhuangtai() { return zhuangtai; }
     public void setZhuangtai(String zhuangtai) { this.zhuangtai = zhuangtai; }
+
+    public String getShoukuanma() { return shoukuanma; }
+    public void setShoukuanma(String shoukuanma) { this.shoukuanma = shoukuanma; }
 }

@@ -21,7 +21,7 @@ public class ZuopintijiaoServiceImpl extends ServiceImpl<ZuopintijiaoDao, Zuopin
     @Override
     public PageUtils queryPage(Map<String, Object> params, Wrapper<ZuopintijiaoEntity> wrapper) {
         Page<ZuopintijiaoEntity> page = new Query<ZuopintijiaoEntity>(params).getPage();
-        page.setRecords(baseMapper.selectListView(wrapper));
+        page.setRecords(baseMapper.selectListView(page, wrapper));
         return new PageUtils(page);
     }
 

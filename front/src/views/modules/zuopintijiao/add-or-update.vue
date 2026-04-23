@@ -157,14 +157,30 @@ export default {
     submit() {
       this.$refs.formRef.validate(valid => {
         if (!valid) return
-        const url = (this.form.id && this.type === 'resubmit') ? 'zuopintijiao/update' : 'zuopintijiao/save'
-        this.$http({ url, method: 'post', data: this.form }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$message.success(this.type === 'resubmit' ? '重新提交成功' : '提交成功')
-            this.back()
-            this.parent.getDataList()
-          } else { this.$message.error(data.msg) }
-        })
+        const isResubmit = this.form.id && this.type === 'resubmit'
+        this.$confirm(
+          isResubmit
+            ? `确认重新提交作品【${this.form.zuopinmingcheng}】？原版本将被覆盖。`
+            : `确认提交作品【${this.form.zuopinmingcheng}】至竞赛【${this.form.jingsaimingcheng}】？`,
+          '提交确认',
+          { confirmButtonText: '确认提交', cancelButtonText: '取消', type: 'info', iconClass: 'el-icon-upload' }
+        ).then(() => {
+          const url = isResubmit ? 'zuopintijiao/update' : 'zuopintijiao/save'
+          this.$http({ url, method: 'post', data: this.form }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$notify({
+                title: isResubmit ? '重新提交成功' : '作品提交成功',
+                message: isResubmit
+                  ? `作品【${this.form.zuopinmingcheng}】已重新提交，请等待评审`
+                  : `作品【${this.form.zuopinmingcheng}】已成功提交至【${this.form.jingsaimingcheng}】`,
+                type: 'success',
+                duration: 4000
+              })
+              this.back()
+              this.parent.getDataList()
+            } else { this.$message.error(data.msg) }
+          })
+        }).catch(() => {})
       })
     },
     back() { this.parent.showFlag = true; this.parent.addOrUpdateFlag = false }

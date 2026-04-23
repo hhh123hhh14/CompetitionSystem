@@ -20,7 +20,7 @@ public class ZhengshuServiceImpl extends ServiceImpl<ZhengshuDao, ZhengshuEntity
     @Override
     public PageUtils queryPage(Map<String, Object> params, Wrapper<ZhengshuEntity> wrapper) {
         Page<ZhengshuEntity> page = new Query<ZhengshuEntity>(params).getPage();
-        page.setRecords(baseMapper.selectListView(wrapper));
+        page.setRecords(baseMapper.selectListView(page, wrapper));
         return new PageUtils(page);
     }
 

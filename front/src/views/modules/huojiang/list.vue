@@ -308,12 +308,24 @@ export default {
     },
     toggleGongshi(row) {
       const newVal = row.sfgs === '是' ? '否' : '是'
-      this.$confirm(`确认${newVal === '是' ? '公示' : '取消公示'}该获奖记录？`, '提示', {
-        confirmButtonText: '确定', cancelButtonText: '取消', type: 'info'
-      }).then(() => {
+      const isPublish = newVal === '是'
+      this.$confirm(
+        isPublish
+          ? `确认将【${row.xueshengxingming}】的【${row.jiangxiangdengji}】公示？公示后所有用户可见。`
+          : `确认取消公示【${row.xueshengxingming}】的获奖记录？`,
+        isPublish ? '公示确认' : '取消公示',
+        { confirmButtonText: '确定', cancelButtonText: '取消', type: isPublish ? 'info' : 'warning' }
+      ).then(() => {
         this.$http({ url: `huojiang/gongshi/${row.id}?sfgs=${newVal}`, method: 'get' }).then(({ data }) => {
           if (data && data.code === 0) {
-            this.$message.success(newVal === '是' ? '已设为公示' : '已取消公示')
+            this.$notify({
+              title: isPublish ? '公示成功' : '已取消公示',
+              message: isPublish
+                ? `${row.xueshengxingming} 的【${row.jiangxiangdengji}】已公示`
+                : `${row.xueshengxingming} 的获奖记录已取消公示`,
+              type: isPublish ? 'success' : 'info',
+              duration: 3000
+            })
             this.getDataList()
           } else {
             this.$message.error(data && data.msg || '操作失败')
@@ -340,8 +352,12 @@ export default {
     },
     deleteHandler(id) {
       const ids = id ? [Number(id)] : this.dataListSelections.map(item => Number(item.id))
-      this.$confirm(`确认删除选中的 ${ids.length} 条获奖记录？`, '警告', {
-        confirmButtonText: '确认删除', cancelButtonText: '取消', type: 'warning'
+      const row = id ? this.dataList.find(d => d.id == id) : null
+      const msg = row
+        ? `确认删除【${row.xueshengxingming}】在【${row.jingsaimingcheng}】中的获奖记录（${row.jiangxiangdengji}）？\n删除后不可恢复！`
+        : `确认删除选中的 ${ids.length} 条获奖记录？删除后不可恢复！`
+      this.$confirm(msg, '删除确认', {
+        confirmButtonText: '确认删除', cancelButtonText: '取消', type: 'error'
       }).then(() => {
         this.$http({ url: 'huojiang/delete', method: 'post', data: ids }).then(({ data }) => {
           if (data && data.code === 0) {

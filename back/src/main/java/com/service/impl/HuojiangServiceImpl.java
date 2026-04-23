@@ -21,7 +21,7 @@ public class HuojiangServiceImpl extends ServiceImpl<HuojiangDao, HuojiangEntity
     @Override
     public PageUtils queryPage(Map<String, Object> params, Wrapper<HuojiangEntity> wrapper) {
         Page<HuojiangEntity> page = new Query<HuojiangEntity>(params).getPage();
-        page.setRecords(baseMapper.selectListView(wrapper));
+        page.setRecords(baseMapper.selectListView(page, wrapper));
         return new PageUtils(page);
     }
 

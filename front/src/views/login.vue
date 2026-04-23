@@ -69,8 +69,12 @@
             <span v-else><i class="el-icon-loading"></i> 登录中...</span>
           </button>
 
-          <!-- 注册链接 -->
+          <!-- 忘记密码与注册链接 -->
           <div class="register-links">
+            <span class="register-link" @click="$router.push('/forgot-password')">
+              <i class="el-icon-question"></i> 忘记密码
+            </span>
+            <span class="sep">|</span>
             <span class="register-link" @click="register('xuesheng')">
               <i class="el-icon-edit"></i> 学生注册
             </span>

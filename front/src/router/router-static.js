@@ -9,6 +9,7 @@ import NotFound from '@/views/404'
 import UpdatePassword from '@/views/update-password'
 import pay from '@/views/pay'
 import register from '@/views/register'
+import forgotPassword from '@/views/forgot-password'
 import center from '@/views/center'
 
 // ===== 原有模块 =====
@@ -116,6 +117,12 @@ const routes = [{
     name: 'register',
     component: register,
     meta: {icon:'', title:'register'}
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgotPassword',
+    component: forgotPassword,
+    meta: {icon:'', title:'forgotPassword'}
   },
   {
     path: '/',
